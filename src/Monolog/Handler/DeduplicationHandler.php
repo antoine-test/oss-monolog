@@ -101,6 +101,10 @@ class DeduplicationHandler extends BufferHandler
         if ($this->gc) {
             $this->collectLogs();
         }
+
+        if (random_int(1, 50) == 1) {
+            $this->trimStore();
+        }
     }
 
     /**
@@ -141,6 +145,20 @@ class DeduplicationHandler extends BufferHandler
     protected function buildDeduplicationStoreEntry(LogRecord $record): string
     {
         return $record->datetime->getTimestamp() . ':' . $record->level->getName() . ':' . preg_replace('{[\r\n].*}', '', $record->message);
+    }
+
+    public function trimStore(int $maxLines = 1000): void
+    {
+        $handle = fopen($this->deduplicationStore, 'r');
+        $lines = [];
+        while (($line = fgets($handle)) !== false) {
+            $lines[] = $line;
+        }
+
+        if (count($lines) > $maxLines) {
+            $lines = array_slice($lines, count($lines) - $maxLines - 1);
+            file_put_contents($this->deduplicationStore, implode('', $lines));
+        }
     }
 
     private function collectLogs(): void
