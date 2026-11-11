@@ -46,6 +46,17 @@ class TagProcessor implements ProcessorInterface
      * @param  string[] $tags
      * @return $this
      */
+    public function removeTags(array $tags = []): self
+    {
+        $this->tags = array_filter($this->tags, static fn ($tag) => !\in_array($tag, $tags, true));
+
+        return $this;
+    }
+
+    /**
+     * @param  string[] $tags
+     * @return $this
+     */
     public function setTags(array $tags = []): self
     {
         $this->tags = $tags;
