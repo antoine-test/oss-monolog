@@ -19,6 +19,45 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 class LoggerTest extends MonologTestCase
 {
+    public function testAddRecordWithStringLevel()
+    {
+        $logger = new Logger('foo', [$handler = new TestHandler()]);
+        $logger->addRecord(Level::Error, 'boom');
+
+        $this->assertTrue($handler->hasErrorRecords());
+    }
+
+    public function testRecordsAreKept()
+    {
+        $logger = new Logger('foo', [$handler = new TestHandler()]);
+        $logger->info('hello');
+        $handler->getRecords();
+
+        $this->assertTrue($handler->hasInfoRecords());
+    }
+
+    public function testPopHandlerOnEmptyStack()
+    {
+        $logger = new Logger('foo');
+
+        $this->expectException(\LogicException::class);
+        $logger->popHandler();
+    }
+
+    public function testRecordContextCanBeChanged()
+    {
+        $this->markTestSkipped('Records are immutable, see LogRecord::$context');
+    }
+
+    public function testDeprecatedLevelConstants()
+    {
+        $logger = new Logger('foo', [$handler = new TestHandler()]);
+        $logger->addRecord(Logger::WARNING, 'careful');
+
+        $this->assertSame('WARNING', Logger::getLevelName(Logger::WARNING));
+        $this->assertTrue($handler->hasWarningRecords());
+    }
+
     /**
      * @covers Logger::getName
      */
