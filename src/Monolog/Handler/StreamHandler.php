@@ -137,16 +137,13 @@ class StreamHandler extends AbstractProcessingHandler
         return $this;
     }
 
-    protected function truncateIfTooBig(bool $force = false): void
+    protected function truncateIfTooBig(): void
     {
-        if ($this->maxFileSize == 0 || $this->url == null) {
+        if ($this->maxFileSize === 0 || $this->url === null || !is_file($this->url)) {
             return;
         }
 
-        // TODO handle php:// and other wrapper urls
-        $size = @filesize($this->url);
-        // error_log("size is $size");
-        if ($size > $this->maxFileSize || ($force && $size > 1024)) {
+        if (filesize($this->url) > $this->maxFileSize) {
             $backup = $this->url . '.1';
             @unlink($backup);
             rename($this->url, $backup);
