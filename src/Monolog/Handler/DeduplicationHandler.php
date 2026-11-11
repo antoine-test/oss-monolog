@@ -149,6 +149,10 @@ class DeduplicationHandler extends BufferHandler
 
     public function trimStore(int $maxLines = 1000): void
     {
+        if (!file_exists($this->deduplicationStore)) {
+            return;
+        }
+
         $handle = fopen($this->deduplicationStore, 'r');
         $lines = [];
         while (($line = fgets($handle)) !== false) {
@@ -156,9 +160,16 @@ class DeduplicationHandler extends BufferHandler
         }
 
         if (count($lines) > $maxLines) {
-            $lines = array_slice($lines, count($lines) - $maxLines - 1);
+            $lines = array_slice($lines, count($lines) - $maxLines);
             file_put_contents($this->deduplicationStore, implode('', $lines));
         }
+    }
+
+    protected function isStored(string $entry): bool
+    {
+        $lines = file($this->deduplicationStore, FILE_IGNORE_NEW_LINES);
+
+        return (bool) array_search($entry, $lines);
     }
 
     private function collectLogs(): void
