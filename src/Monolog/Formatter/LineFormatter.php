@@ -197,29 +197,18 @@ class LineFormatter extends NormalizerFormatter
         return $this;
     }
 
-    private function colorizeLevel(string $levelName, int $level, bool $bold = false, string $theme = 'default'): string
+    private function colorizeLevel(string $levelName, int $level): string
     {
-        if ($level >= 600) {
-            $color = "\033[1;37;41m";
-        } elseif ($level >= 550) {
-            $color = "\033[1;37;45m";
-        } elseif ($level >= 500) {
-            $color = "\033[1;31m";
-        } elseif ($level >= 400) {
-            $color = "\033[0;31m";
-        } elseif ($level >= 300) {
-            $color = "\033[0;33m";
-        } elseif ($level >= 250) {
-            $color = "\033[0;36m";
-        } elseif ($level >= 200) {
-            $color = "\033[0;32m";
-        } else {
-            $color = "\033[0;37m";
-        }
-
-        if ($theme == 'light') {
-            $color = str_replace('37', '30', $color);
-        }
+        $color = match (true) {
+            $level >= 600 => "\033[1;37;41m",
+            $level >= 550 => "\033[1;37;45m",
+            $level >= 500 => "\033[1;31m",
+            $level >= 400 => "\033[0;31m",
+            $level >= 300 => "\033[0;33m",
+            $level >= 250 => "\033[0;36m",
+            $level >= 200 => "\033[0;32m",
+            default => "\033[0;37m",
+        };
 
         return $color . $levelName . "\033[0m";
     }
