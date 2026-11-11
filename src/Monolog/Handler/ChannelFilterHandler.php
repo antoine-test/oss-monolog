@@ -41,7 +41,7 @@ class ChannelFilterHandler extends AbstractProcessingHandler
         return \in_array($record->channel, $this->channels) && $record->level >= $this->level;
     }
 
-    public function handle(array $record): bool
+    public function handle(LogRecord $record): bool
     {
         if (!$this->isHandling($record)) {
             return false;
