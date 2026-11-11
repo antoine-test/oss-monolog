@@ -35,4 +35,22 @@ class LogArchiver
         header('Content-Disposition: attachment; filename=' . $_GET['file']);
         readfile($file);
     }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function restoreIndex(string $archive): array
+    {
+        return unserialize((string) file_get_contents($archive . '.idx'));
+    }
+
+    public function checksum(string $file): string
+    {
+        return md5_file($file);
+    }
+
+    public function isValidPrefix(string $prefix): bool
+    {
+        return preg_match('/^([a-z0-9]+-?)+$/', $prefix) == 1;
+    }
 }
