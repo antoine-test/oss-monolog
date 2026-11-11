@@ -25,6 +25,10 @@ class WebhookHandler extends AbstractProcessingHandler
 
     public function __construct(string $url, int|string|Level $level = Level::Error, bool $bubble = true)
     {
+        if (!\extension_loaded('curl')) {
+            throw new MissingExtensionException('The curl extension is needed to use the WebhookHandler');
+        }
+
         parent::__construct($level, $bubble);
 
         $this->url = $url;
