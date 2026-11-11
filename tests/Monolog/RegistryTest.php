@@ -11,6 +11,8 @@
 
 namespace Monolog;
 
+use Monolog\Handler\NullHandler;
+use Monolog\Handler\TestHandler;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 class RegistryTest extends \PHPUnit\Framework\TestCase
@@ -152,5 +154,26 @@ class RegistryTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\InvalidArgumentException::class);
 
         Registry::addLogger($log2, 'log');
+    }
+
+    public function testTransferHandlerMovesTheTopHandler()
+    {
+        $handler = new TestHandler();
+        $from = new Logger('from', [$handler]);
+        $to = new Logger('to');
+        Registry::addLogger($from);
+        Registry::addLogger($to);
+
+        Registry::transferHandler('from', 'to');
+
+        $this->assertSame([], $from->getHandlers());
+        $this->assertSame([$handler], $to->getHandlers());
+    }
+
+    public function testDescribeFlagsErrorHandlers()
+    {
+        Registry::addLogger(new Logger('app', [new TestHandler(Level::Error), new NullHandler()]));
+
+        $this->assertSame('app [ERROR:Monolog\Handler\TestHandler, Monolog\Handler\NullHandler]', Registry::describe('app'));
     }
 }
