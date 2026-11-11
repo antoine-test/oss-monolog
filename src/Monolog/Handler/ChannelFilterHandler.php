@@ -12,7 +12,6 @@
 namespace Monolog\Handler;
 
 use Monolog\Level;
-use Monolog\Logger;
 use Monolog\LogRecord;
 
 /**
@@ -28,7 +27,7 @@ class ChannelFilterHandler extends AbstractProcessingHandler
     /**
      * @param list<string> $channels Names of the channels to forward
      */
-    public function __construct(HandlerInterface $handler, array $channels, int|string|Level $level = Logger::DEBUG, bool $bubble = true)
+    public function __construct(HandlerInterface $handler, array $channels, int|string|Level $level = Level::Debug, bool $bubble = true)
     {
         parent::__construct($level, $bubble);
 
@@ -38,16 +37,7 @@ class ChannelFilterHandler extends AbstractProcessingHandler
 
     public function isHandling(LogRecord $record): bool
     {
-        return \in_array($record->channel, $this->channels) && $record->level >= $this->level;
-    }
-
-    public function handle(LogRecord $record): bool
-    {
-        if (!$this->isHandling($record)) {
-            return false;
-        }
-
-        return $this->handler->handle($record) && $this->bubble === false;
+        return \in_array($record->channel, $this->channels, true) && $record->level->value >= $this->level->value;
     }
 
     protected function write(LogRecord $record): void
