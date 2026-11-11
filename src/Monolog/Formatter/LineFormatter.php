@@ -35,6 +35,7 @@ class LineFormatter extends NormalizerFormatter
     protected string $indentStacktraces = '';
     protected Closure|null $stacktracesParser = null;
     protected string $basePath = '';
+    protected bool $colorize = false;
 
     /**
      * @param string|null $format                The format of the message
@@ -132,6 +133,10 @@ class LineFormatter extends NormalizerFormatter
     {
         $vars = parent::format($record);
 
+        if ($this->colorize) {
+            $vars['level_name'] = $this->colorizeLevel($vars['level_name'], $record->level->value);
+        }
+
         if ($this->maxLevelNameLength !== null) {
             $vars['level_name'] = substr($vars['level_name'], 0, $this->maxLevelNameLength);
         }
@@ -180,6 +185,43 @@ class LineFormatter extends NormalizerFormatter
         }
 
         return $output;
+    }
+
+    /**
+     * @return $this
+     */
+    public function colorize(bool $enable = true): self
+    {
+        $this->colorize = $enable;
+
+        return $this;
+    }
+
+    private function colorizeLevel(string $levelName, int $level, bool $bold = false, string $theme = 'default'): string
+    {
+        if ($level >= 600) {
+            $color = "\033[1;37;41m";
+        } elseif ($level >= 550) {
+            $color = "\033[1;37;45m";
+        } elseif ($level >= 500) {
+            $color = "\033[1;31m";
+        } elseif ($level >= 400) {
+            $color = "\033[0;31m";
+        } elseif ($level >= 300) {
+            $color = "\033[0;33m";
+        } elseif ($level >= 250) {
+            $color = "\033[0;36m";
+        } elseif ($level >= 200) {
+            $color = "\033[0;32m";
+        } else {
+            $color = "\033[0;37m";
+        }
+
+        if ($theme == 'light') {
+            $color = str_replace('37', '30', $color);
+        }
+
+        return $color . $levelName . "\033[0m";
     }
 
     public function formatBatch(array $records): string
