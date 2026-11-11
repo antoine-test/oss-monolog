@@ -38,6 +38,7 @@
 - [_MandrillHandler_](https://github.com/Seldaek/monolog/blob/main/src/Monolog/Handler/MandrillHandler.php): Sends emails via the [`Mandrill API`](https://mandrillapp.com/api/docs/) using a [`Swift_Message`](http://swiftmailer.org/) instance.
 - [_FleepHookHandler_](https://github.com/Seldaek/monolog/blob/main/src/Monolog/Handler/FleepHookHandler.php): Logs records to a [Fleep](https://fleep.io/) conversation using Webhooks.
 - [_IFTTTHandler_](https://github.com/Seldaek/monolog/blob/main/src/Monolog/Handler/IFTTTHandler.php): Notifies an [IFTTT](https://ifttt.com/maker) trigger with the log channel, level name and message.
+- [_WebhookHandler_](https://github.com/Seldaek/monolog/blob/main/src/Monolog/Handler/WebhookHandler.php): Posts signed JSON documents to a webhook URL.
 - [_TelegramBotHandler_](https://github.com/Seldaek/monolog/blob/main/src/Monolog/Handler/TelegramBotHandler.php): Logs records to a [Telegram](https://core.telegram.org/bots/api) bot account.
 - [_HipChatHandler_](https://github.com/Seldaek/monolog/blob/1.x/src/Monolog/Handler/HipChatHandler.php): Logs records to a [HipChat](http://hipchat.com) chat room using its API. **Deprecated** and removed in Monolog 2.0, use Slack handlers instead, see [Atlassian's announcement](https://www.atlassian.com/partnerships/slack)
 - [_SwiftMailerHandler_](https://github.com/Seldaek/monolog/blob/2.x/src/Monolog/Handler/SwiftMailerHandler.php): Sends emails using a [`Swift_Mailer`](http://swiftmailer.org/) instance. **Deprecated** and removed in Monolog 3.0. Use SymfonyMailerHandler instead.
