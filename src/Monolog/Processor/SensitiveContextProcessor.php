@@ -35,17 +35,29 @@ class SensitiveContextProcessor implements ProcessorInterface
      */
     public function __invoke(LogRecord $record): LogRecord
     {
-        foreach ($record->context as $key => $value) {
-            if (\in_array($key, $this->keys)) {
-                $record->context[$key] = '***';
+        $context = $record->context;
+        foreach ($context as $key => $value) {
+            if (\in_array($key, $this->keys, true)) {
+                $context[$key] = '***';
             } elseif (\is_object($value)) {
-                $record->context[$key] = Utils::jsonEncode($value);
+                $context[$key] = Utils::jsonEncode($value, null, true);
             }
         }
 
+        $extra = $record->extra;
         $limit = Utils::expandIniShorthandBytes(\ini_get('memory_limit'));
-        $record->extra['memory_headroom'] = $limit - memory_get_usage();
+        if ($limit !== false && $limit > 0) {
+            $extra['memory_headroom'] = $limit - memory_get_usage();
+        }
 
-        return $record;
+        return new LogRecord(
+            datetime: $record->datetime,
+            channel: $record->channel,
+            level: $record->level,
+            message: $record->message,
+            context: $context,
+            extra: $extra,
+            formatted: $record->formatted,
+        );
     }
 }
