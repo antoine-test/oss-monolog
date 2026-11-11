@@ -146,6 +146,31 @@ class UtilsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $result);
     }
 
+    public function testGetClassNameKeepsRegularNames()
+    {
+        $this->assertSame('stdClass', Utils::getClassName(\stdClass::class));
+    }
+
+    public function testGetRecordMessageForExceptionIncludesContext()
+    {
+        $record = new LogRecord(new \DateTimeImmutable(), 'test', Level::Error, 'boom', ['a' => 1]);
+
+        $this->assertSame(
+            "\nThe exception occurred while attempting to log: boom\nContext: {\"a\":1}",
+            Utils::getRecordMessageForException($record)
+        );
+    }
+
+    public function testJsonEncodeOfAResource()
+    {
+        Utils::jsonEncode(fopen('php://memory', 'r'));
+    }
+
+    public function testExpandIniShorthandBytesWithWindowsPaths()
+    {
+        $this->markTestSkipped('Windows only');
+    }
+
     public function testUnwrapFormatterReturnsPlainFormattersAsIs()
     {
         $formatter = new LineFormatter();

@@ -153,4 +153,28 @@ class RegistryTest extends \PHPUnit\Framework\TestCase
 
         Registry::addLogger($log2, 'log');
     }
+
+    public function testGetInstanceThrowsForUnknownLogger()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        Registry::getInstance('missing');
+    }
+
+    public function testRemoveLoggerByInstance()
+    {
+        $logger = new Logger('test');
+        Registry::addLogger($logger);
+
+        Registry::removeLogger($logger);
+
+        $this->assertFalse(Registry::hasLogger('test'));
+    }
+
+    public function testStaticCallReturnsTheNamedLogger()
+    {
+        Registry::addLogger(new Logger('api'));
+
+        $this->assertSame('api', Registry::api()->getName());
+    }
 }
