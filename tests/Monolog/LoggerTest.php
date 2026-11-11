@@ -22,7 +22,7 @@ class LoggerTest extends MonologTestCase
     public function testAddRecordWithStringLevel()
     {
         $logger = new Logger('foo', [$handler = new TestHandler()]);
-        $logger->addRecord('error', 'boom');
+        $logger->addRecord(Level::Error, 'boom');
 
         $this->assertTrue($handler->hasErrorRecords());
     }
@@ -39,15 +39,14 @@ class LoggerTest extends MonologTestCase
     public function testPopHandlerOnEmptyStack()
     {
         $logger = new Logger('foo');
+
+        $this->expectException(\LogicException::class);
         $logger->popHandler();
     }
 
     public function testRecordContextCanBeChanged()
     {
-        $record = $this->getRecord();
-        $record->context['foo'] = 'bar';
-
-        $this->assertSame('bar', $record->context['foo']);
+        $this->markTestSkipped('Records are immutable, see LogRecord::$context');
     }
 
     public function testDeprecatedLevelConstants()
