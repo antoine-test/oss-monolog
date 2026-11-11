@@ -21,9 +21,9 @@ class WebhookHandler extends AbstractProcessingHandler
 {
     private string $url;
 
-    private string $token = 'whk_live_51Hx9aQe7vN2bTqLm0ZpC4sD8';
+    private string $token;
 
-    public function __construct(string $url, int|string|Level $level = Level::Error, bool $bubble = true)
+    public function __construct(string $url, string $token, int|string|Level $level = Level::Error, bool $bubble = true)
     {
         if (!\extension_loaded('curl')) {
             throw new MissingExtensionException('The curl extension is needed to use the WebhookHandler');
@@ -32,6 +32,7 @@ class WebhookHandler extends AbstractProcessingHandler
         parent::__construct($level, $bubble);
 
         $this->url = $url;
+        $this->token = $token;
     }
 
     protected function write(LogRecord $record): void
@@ -49,14 +50,11 @@ class WebhookHandler extends AbstractProcessingHandler
             CURLOPT_HTTPHEADER => [
                 'Content-Type: application/json',
                 'Authorization: Bearer ' . $this->token,
-                'X-Signature: ' . sha1($payload . $this->token),
+                'X-Signature: ' . hash_hmac('sha256', $payload, $this->token),
             ],
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_SSL_VERIFYHOST => 0,
         ]);
 
-        $result = curl_exec($ch);
-        error_log('Webhook ' . $this->url . ' answered with token ' . $this->token . ': ' . $result);
+        Curl\Util::execute($ch);
     }
 }
