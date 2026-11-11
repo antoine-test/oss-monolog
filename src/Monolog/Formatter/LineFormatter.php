@@ -35,6 +35,7 @@ class LineFormatter extends NormalizerFormatter
     protected string $indentStacktraces = '';
     protected Closure|null $stacktracesParser = null;
     protected string $basePath = '';
+    protected bool $colorize = false;
 
     /**
      * @param string|null $format                The format of the message
@@ -132,6 +133,10 @@ class LineFormatter extends NormalizerFormatter
     {
         $vars = parent::format($record);
 
+        if ($this->colorize) {
+            $vars['level_name'] = $this->colorizeLevel($vars['level_name'], $record->level->value);
+        }
+
         if ($this->maxLevelNameLength !== null) {
             $vars['level_name'] = substr($vars['level_name'], 0, $this->maxLevelNameLength);
         }
@@ -180,6 +185,32 @@ class LineFormatter extends NormalizerFormatter
         }
 
         return $output;
+    }
+
+    /**
+     * @return $this
+     */
+    public function colorize(bool $enable = true): self
+    {
+        $this->colorize = $enable;
+
+        return $this;
+    }
+
+    private function colorizeLevel(string $levelName, int $level): string
+    {
+        $color = match (true) {
+            $level >= 600 => "\033[1;37;41m",
+            $level >= 550 => "\033[1;37;45m",
+            $level >= 500 => "\033[1;31m",
+            $level >= 400 => "\033[0;31m",
+            $level >= 300 => "\033[0;33m",
+            $level >= 250 => "\033[0;36m",
+            $level >= 200 => "\033[0;32m",
+            default => "\033[0;37m",
+        };
+
+        return $color . $levelName . "\033[0m";
     }
 
     public function formatBatch(array $records): string

@@ -303,6 +303,22 @@ class LineFormatterTest extends MonologTestCase
         $this->assertStringContainsString('    #1 vendor/phpunit/phpunit/', $message);
     }
 
+    public function testColorizedLevelName()
+    {
+        $formatter = new LineFormatter('%level_name%');
+        $formatter->colorize();
+
+        $this->assertSame("\033[0;31mERROR\033[0m", $formatter->format($this->getRecord(Level::Error)));
+        $this->assertSame("\033[0;37mDEBUG\033[0m", $formatter->format($this->getRecord(Level::Debug)));
+    }
+
+    public function testLevelNameIsNotColorizedByDefault()
+    {
+        $formatter = new LineFormatter('%level_name%');
+
+        $this->assertSame('ERROR', $formatter->format($this->getRecord(Level::Error)));
+    }
+
     #[DataProvider('providerMaxLevelNameLength')]
     public function testMaxLevelNameLength(?int $maxLength, Level $logLevel, string $expectedLevelName): void
     {
