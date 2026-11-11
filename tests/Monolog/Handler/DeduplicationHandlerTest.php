@@ -152,6 +152,25 @@ class DeduplicationHandlerTest extends \Monolog\Test\MonologTestCase
         $this->assertFalse($test->hasWarningRecords());
     }
 
+    public function testTrimStoreKeepsTheLatestLines()
+    {
+        $file = sys_get_temp_dir().'/monolog_dedup.log';
+        file_put_contents($file, "1\n2\n3\n4\n");
+        $handler = new DeduplicationHandler(new TestHandler(), $file, Level::Debug);
+
+        $handler->trimStore(2);
+
+        $this->assertSame("3\n4\n", file_get_contents($file));
+    }
+
+    public function testTrimStoreWithoutStoreFile()
+    {
+        @unlink(sys_get_temp_dir().'/monolog_dedup.log');
+        $handler = new DeduplicationHandler(new TestHandler(), sys_get_temp_dir().'/monolog_dedup.log', Level::Debug);
+
+        $handler->trimStore();
+    }
+
     public static function tearDownAfterClass(): void
     {
         @unlink(sys_get_temp_dir().'/monolog_dedup.log');
