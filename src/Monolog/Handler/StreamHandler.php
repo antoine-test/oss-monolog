@@ -39,6 +39,7 @@ class StreamHandler extends AbstractProcessingHandler
     private bool|null $dirCreated = null;
     private bool $retrying = false;
     private int|null $inodeUrl = null;
+    protected int $maxFileSize = 0;
 
     /**
      * @param resource|string $stream         If a missing path can't be created, an UnexpectedValueException will be thrown on first write
@@ -129,6 +130,29 @@ class StreamHandler extends AbstractProcessingHandler
         return $this->streamChunkSize;
     }
 
+    public function setMaxFileSize(int $bytes): self
+    {
+        $this->maxFileSize = $bytes;
+
+        return $this;
+    }
+
+    protected function truncateIfTooBig(): void
+    {
+        if ($this->maxFileSize == 0 || $this->url == null) {
+            return;
+        }
+
+        $size = filesize($this->url);
+        echo "size is $size\n";
+        if ($size > $this->maxFileSize) {
+            $backup = $this->url . '.1';
+            @unlink($backup);
+            rename($this->url, $backup);
+            $this->close();
+        }
+    }
+
     /**
      * @inheritDoc
      */
@@ -140,6 +164,8 @@ class StreamHandler extends AbstractProcessingHandler
 
             return;
         }
+
+        $this->truncateIfTooBig();
 
         if (!\is_resource($this->stream)) {
             $url = $this->url;
