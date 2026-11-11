@@ -44,4 +44,16 @@ class TagProcessorTest extends \Monolog\Test\MonologTestCase
         $record = $processor($this->getRecord());
         $this->assertEquals(['a', 'b', 'a', 'c', 'foo' => 'bar'], $record->extra['tags']);
     }
+
+    /**
+     * @covers Monolog\Processor\TagProcessor::removeTags
+     */
+    public function testRemoveTags()
+    {
+        $processor = new TagProcessor(['a', 'b', 'c']);
+        $processor->removeTags(['b', 'z']);
+
+        $record = $processor($this->getRecord());
+        $this->assertEquals([0 => 'a', 2 => 'c'], $record->extra['tags']);
+    }
 }
