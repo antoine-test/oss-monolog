@@ -23,6 +23,35 @@ class StreamHandlerTest extends \Monolog\Test\MonologTestCase
         @unlink(__DIR__.'/test.log');
     }
 
+    public function testSetMaxFileSizeMovesTheLargeFileAway()
+    {
+        $file = __DIR__.'/test.log';
+        file_put_contents($file, str_repeat('x', 100));
+
+        $handler = new StreamHandler($file);
+        $handler->setMaxFileSize(10);
+        $handler->setFormatter($this->getIdentityFormatter());
+        $handler->handle($this->getRecord(Level::Warning, 'test'));
+
+        $this->assertFileExists($file.'.1');
+        $this->assertSame('test', file_get_contents($file));
+        unlink($file.'.1');
+    }
+
+    public function testSmallFilesAreKept()
+    {
+        $file = __DIR__.'/test.log';
+        file_put_contents($file, 'abc');
+
+        $handler = new StreamHandler($file);
+        $handler->setMaxFileSize(1000);
+        $handler->setFormatter($this->getIdentityFormatter());
+        $handler->handle($this->getRecord(Level::Warning, 'test'));
+
+        $this->assertFileDoesNotExist($file.'.1');
+        $this->assertSame('abctest', file_get_contents($file));
+    }
+
     /**
      * @covers Monolog\Handler\StreamHandler::__construct
      * @covers Monolog\Handler\StreamHandler::write
