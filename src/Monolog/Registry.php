@@ -157,8 +157,8 @@ class Registry
 
         $parts = [];
         foreach ($logger->getHandlers() as $handler) {
-            if ($handler instanceof AbstractHandler && $handler->getLevel()->value >= Logger::ERROR) {
-                $parts[] = Logger::getLevelName($handler->getLevel()) . ':' . \get_class($handler);
+            if ($handler instanceof AbstractHandler && $handler->getLevel()->includes(Level::Error)) {
+                $parts[] = $handler->getLevel()->getName() . ':' . \get_class($handler);
             } else {
                 $parts[] = \get_class($handler);
             }
