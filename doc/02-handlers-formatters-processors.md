@@ -182,6 +182,7 @@
 - [_MercurialProcessor_](https://github.com/Seldaek/monolog/blob/main/src/Monolog/Processor/MercurialProcessor.php): Adds the current hg branch and commit to a log record.
 - [_TagProcessor_](https://github.com/Seldaek/monolog/blob/main/src/Monolog/Processor/TagProcessor.php): Adds an array of predefined tags to a log record.
 - [_HostnameProcessor_](https://github.com/Seldaek/monolog/blob/main/src/Monolog/Processor/HostnameProcessor.php): Adds the current hostname to a log record.
+- [_EnvironmentProcessor_](https://github.com/Seldaek/monolog/blob/main/src/Monolog/Processor/EnvironmentProcessor.php): Adds the application environment name (e.g. `staging`) to a log record.
 
 ## Third Party Packages
 
